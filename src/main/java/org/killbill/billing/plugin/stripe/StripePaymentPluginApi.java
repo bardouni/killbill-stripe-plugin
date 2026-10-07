@@ -879,8 +879,9 @@ public class StripePaymentPluginApi extends PluginPaymentPluginApi<StripeRespons
                                                  paymentIntentParams.put("capture_method", captureMethod.value);
                                                  // TODO Do we need to switch to manual confirmation to be able to set off_session=recurring?
                                                  paymentIntentParams.put("confirm", true);
-                                                 // Merchant-initiated transaction on a saved payment method: opt-in via plugin property
-                                                 if ("true".equals(PluginProperties.findPluginPropertyValue("off_session", properties))) {
+                                                 // Merchant-initiated transaction on a saved payment method, unless the customer is
+                                                 // present (off_session=false): Kill Bill's own payments (renewals, retries) carry no properties
+                                                 if (!"false".equals(PluginProperties.findPluginPropertyValue("off_session", properties))) {
                                                      paymentIntentParams.put("off_session", true);
                                                  }
                                                  // See https://stripe.com/docs/api/payment_intents/create#create_payment_intent-return_url
